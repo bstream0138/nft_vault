@@ -42,6 +42,7 @@ export const jsonToPinata = async (metaData) => {
 
     const res = await axios
       .post("https://api.pinata.cloud/pinning/pinJSONToIPFS", data, {
+        maxBodyLength: "Infinity",
         headers: {
           "Content-Type": "application/json",
           pinata_api_key: `${REACT_APP_ACCESS_KEY}`,
