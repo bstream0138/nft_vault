@@ -2,7 +2,9 @@
 
 ## 2023-11-01 기본 세팅 및 NFT 로딩 완료
 
-![프로젝트 실행 스크린샷] (/images/project_20231101.png)
+[screenshot-20231101]
+
+![프로젝트 실행 스크린샷](images/project_20231101.png)
 
 ### To Do List
 1. 출석부 느낌으로 front-end 개선 
