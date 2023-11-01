@@ -10,4 +10,11 @@ module.exports = {
       os: require.resolve("os-browserify/browser"),
     },
   },
+
+  plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
+
+  ],
 };

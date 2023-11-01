@@ -1,17 +1,17 @@
 # 코드스테이츠x서울이노베이션스퀘어 블록체인 교육
-## 프로젝트 세팅
 
-### (완료) `.env.example`에 `EOA, Pinata, KAS` API keys를 기입(`.example 삭제`)
+## 2023-11-01 기본 세팅 및 NFT 로딩 완료
 
-### (자신의 컨트랙트를 사용하려면) `/contract/CodestatesAttend.json` 파일을 `자신의 컨트랙트 ABI파일`로 변경해주세요.
+### To Do List
+1. 출석부 느낌으로 front-end 개선 
+2. 컨트랙트 추가해보기 - `/contract/CodestatesAttend.json` 파일을 `자신의 컨트랙트 ABI파일`로 변경해주세요.
 
 <br />
 
-## 옵셔널 세팅
-
+## 2023-10-31 프로젝트 세팅
+### (완료) `.env.example`에 `EOA, Pinata, KAS` API keys를 기입(`.example 삭제`)
 ### (완료) `shift + command + x` 눌러서 `eslint extension` 설치 (optional)
-
-### (Optional) caver 호환성 문제
+### (완료) caver 호환성 문제
 
 ```js
 module.exports = {
