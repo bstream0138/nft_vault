@@ -121,7 +121,7 @@ export default function Header() {
         >
           <img src={headerMMG} width="auto" height="40px" alt="logo" />
           <Typography variant="h4" ml="10px">
-            My NFT Vault
+            ICT x Codestates 블록체인 과정 출석부
           </Typography>
         </Box>
         <Box

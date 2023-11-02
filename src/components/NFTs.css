@@ -1,0 +1,13 @@
+
+/* 캘린더를 감싸는 컨테이너의 크기를 100%로 설정 */
+.calendar-container {
+    width: 100%;
+    height: 100vh; /* 화면 높이에 맞게 조정 */
+  }
+  
+  /* 캘린더뷰의 크기를 100%로 설정 */
+  .react-calendar {
+    width: 100% !important; /* !important 키워드는 다른 스타일을 덮어쓰기 위해 사용됩니다. */
+    height: 100% !important;
+  }
+  

@@ -1,3 +1,8 @@
+// react 캘린더 라이브러리 import
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css'
+import "./NFTs.css";
+
 import React, { useEffect, useState } from "react";
 
 // MUI css
@@ -24,6 +29,13 @@ export default function NFTs() {
   const [isCardExpanded, setIsCardExpanded] = useState([]);
   const isLoading = useSetRecoilState(loadingState);
 
+  // 캘린더뷰의 시작일자는 수업 시작일자인 10월 18일로
+  // 10월 18일 시작하려면 9월 18일로 셋팅
+  const [activeStartDate, setActiveStartDate] = useState(new Date(2023, 9, 10));
+
+  // NFT를 날짜별로 정리
+  const [calendarNfts, setCalendarNfts] = useState({});
+
   const getNfts = async () => {
     isLoading({ isLoading: true });
     const nfts = await getNftsByAddress(address);
@@ -49,10 +61,92 @@ export default function NFTs() {
     window.open(`https://baobab.klaytnscope.com/tx/${tx}?tabId=nftTransfer`);
   };
 
+
+  // NFT 데이터를 날짜별로 가공하는 함수를 추가합니다.
+  const processNFTsForCalendar = (nfts) => {
+    const nftByDate = {};
+
+
+    console.log(`nfts: ${nfts.length}`);
+    
+    nfts.forEach((nft) => {
+      const createdAt = new Date(nft.createdAt).toISOString().split('T')[0]
+      console.log(`nft's createdAt: ${createdAt}`);
+
+      // createdAt에 해당하는 날짜가 없다면 배열 생성
+      if (!nftByDate[createdAt]) {
+        nftByDate[createdAt] = [];
+      }
+
+      nftByDate[createdAt].push(nft);
+    });
+
+    // 키 개수 확인
+    console.log(`nftByDate: ${Object.keys(nftByDate).length}`);
+
+    return nftByDate;
+  };
+
   useEffect(() => {
-    getNfts();
+    getNfts();    
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    // 날짜별로 정리하고, 동일 날짜 NFT는 생성시간 가장 빠른 것만
+    const processedNfts = processNFTsForCalendar(nfts);
+    setCalendarNfts(processedNfts);
+  }, [nfts]);
+
+  // 캘린더에서 날짜가 변경될 때
+  const onActiveStartDateChange = ({ activeStartDate, value, view }) => {
+    setActiveStartDate(activeStartDate);
+  };
+
+  // 캘린더에서 날짜를 클릭했을 때
+  const onDayClick = (value, event) => {
+    const dateKey = value.toISOString().split('T')[0];
+    const nft = nfts.find((nft) => new Date(nft.createdAt).toDateString() === dateKey);
+    if(nft) {
+      // 상세 정보를 표시하는 로직을 구현한다.
+      // 예를 들어, 모달을 열어 상세 정보를 보여주는 것 등...
+    }
+  };
+
+  // 캘린더 타일을 렌더링하는 함수
+  const renderCalendarTile = ({ date, view }) => {
+    const dateKey = date.toISOString().split('T')[0];
+    const dayNfts = calendarNfts[dateKey] || [];
+
+    // 해당 날짜와 dayNfts.length를 콘솔에 출력
+    //console.log(`Date: ${dateKey}, NFT Count: ${dayNfts.length}`);
+    // 해당 날짜와 dayNfts.length를 콘솔에 출력
+    console.log(`Date: ${dateKey}, NFT Count: ${dayNfts.length}`);
+
+
+    if (dayNfts.length > 0 ){
+      // 해당 날짜에 NFT가 있다면 첫번째 NFT만 사용
+      const nft = dayNfts[0];
+
+      return (
+        <div>
+          <div key={nft.id}>
+            <img
+                  src={nft.image}
+                  alt={nft.name}
+                  style={{ width: "100px" }}
+                  onClick={() => {
+                    // 이미지를 클릭했을 때 상세 정보를 표시하는 로직을 구현
+                    alert(`NFT Name: ${nft.name}\nDescription: ${nft.description}`);
+                  }}
+                />
+          </div>
+        </div>
+      )
+    }
+    // 해당 날짜에 NFT가 없으면 
+    return null;
+  };
 
   const rendering = () => {
     return (
@@ -229,5 +323,21 @@ export default function NFTs() {
     );
   };
 
-  return <Box>{rendering()}</Box>;
+  
+
+  return (
+    <Box className="calendar-container">
+      <Calendar
+        onChange={onDayClick}
+        value={activeStartDate}
+        onActiveStartDateChange={onActiveStartDateChange}
+        onClickDay={onDayClick}
+        tileContent={renderCalendarTile}
+        view="month"
+        calendarType="US"
+      />
+      
+    </Box>
+  );
+
 }
