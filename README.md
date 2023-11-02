@@ -1,5 +1,18 @@
 # 코드스테이츠x서울이노베이션스퀘어 블록체인 교육
 
+## 2023-11-02 Front-end 개선 중
+
+[screenshot-20231102]
+
+![프로젝트 실행 스크린샷](images/project_20231102.png)
+
+### To Do List
+1. NFT 생성일자 다른데 캘린더 일자 겹치는 문제 해결
+2. 나만의 컨트랙트 추가해보기 - `/contract/CodestatesAttend.json` 파일을 `자신의 컨트랙트 ABI파일`로 변경해주세요.
+3. MINT 페이지와 Pinata 연결
+
+<br />
+
 ## 2023-11-01 기본 세팅 및 NFT 로딩 완료
 
 [screenshot-20231101]
