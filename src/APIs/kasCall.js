@@ -11,6 +11,10 @@ axios.defaults.withCredentials = true;
 
 // EOA로 NFTs 가져오기
 export const getNftsByAddress = async (address) => {
+
+  // address 갱신 잘되는지 확인
+  console.log(`current address is ${address}`);
+
   const result = [];
   try {
     const options = {

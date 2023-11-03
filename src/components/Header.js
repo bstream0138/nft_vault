@@ -117,7 +117,9 @@ export default function Header() {
       >
         <Box
           onClick={reset}
-          sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }}
+          sx={{ display: "flex", justifyContent: "center", cursor: "pointer", 
+          mt: "20px" 
+        }}
         >
           <img src={headerMMG} width="auto" height="40px" alt="logo" />
           <Typography variant="h4" ml="10px">
@@ -128,7 +130,7 @@ export default function Header() {
           sx={{
             display: "flex",
             justifyContent: "space-evenly",
-            mt: "15px",
+            mt: "30px",
             width: "100%",
           }}
         >

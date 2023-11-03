@@ -49,7 +49,7 @@ export default function Main() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", mt: "3%" }}>
       <Box sx={{ display: "flex", justifyContent: "center", mt: "5%" }}>
-        <Typography>PrivateKey or Mnemonic</Typography>
+        <Typography> &lt; PrivateKey or Mnemonic &gt; </Typography>
       </Box>
       <Box
         sx={{

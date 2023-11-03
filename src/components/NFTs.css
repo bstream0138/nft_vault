@@ -2,12 +2,26 @@
 /* 캘린더를 감싸는 컨테이너의 크기를 100%로 설정 */
 .calendar-container {
     width: 100%;
-    height: 100vh; /* 화면 높이에 맞게 조정 */
+    height: 100vh; /* 화면 높이에 맞게 */
   }
   
   /* 캘린더뷰의 크기를 100%로 설정 */
   .react-calendar {
-    width: 100% !important; /* !important 키워드는 다른 스타일을 덮어쓰기 위해 사용됩니다. */
+    width: 100% !important; /* !important 키워드로 다른 스타일을 덮어쓰기 */
     height: 100% !important;
   }
-  
+
+  /* 캘린더 타일의 가로 세로 크기를 100px로 고정 */
+.calendar-tile {
+  width: 100px; 
+  height: 100px;
+}
+
+.calendar-container .react-calendar__navigation__label {
+  font-size: 24px;
+}
+
+/* 이미지 좌우 정렬 - 작동 안함 체크할 것 */
+.image-tile {
+  justify-content: center; 
+}
