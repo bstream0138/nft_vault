@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 
+import { useNavigate } from 'react-router-dom';
+
 // MUI css
 import {
   Box,
@@ -29,12 +31,11 @@ import "./NFTs.css";
 export default function NFTs() {
 
   const addresses = [
-    "0x0de9e664f2f8f773b98e42a26a59fffba9a3e2be",
-    "0x5D674b20c73CCf59e7aFDc3fDC5427f59C821cea",
-    "0x111B2F59D47f53572E41c3c78140625DA425E23c",
-    "0xFcCe29a8503b1e66FAfDeB76157EcEbfFCf0309b",
-    "0x812973084D6fBd58D7f440eeFA98C49677894A94",
-    "0xd167Dd9b2B1587532b23BE52a89cfa08614C92Fd",
+    "0x0de9e664f2f8f773b98e42a26a59fffba9a3e2be", //84
+    "0xFcCe29a8503b1e66FAfDeB76157EcEbfFCf0309b", //68
+    "0x5D674b20c73CCf59e7aFDc3fDC5427f59C821cea", //100
+    "0x812973084D6fBd58D7f440eeFA98C49677894A94", //57
+    "0x2CA286026fbBC8bA9b39290bBFEa64d780f47010",
     "0x180A008a563eFD8aD0d1025090F7B2Fc2CCCf1b3"
   ];
   
@@ -54,20 +55,26 @@ export default function NFTs() {
   const [selectedNFT, setSelectedNFT] = useState(null);
 
   // 출석부에서 표시하고 있는 address 변수
-  const [selectedAddress, setSelectedAddress] = useState(address);
+  const [selectedAddress, setSelectedAddress] = useState("");
 
   // 출석률 계산
   const [totalDays] = useState(19);
-  const [participationDays, setParticipationDays] = useState(0);
+  const [attendanceRate, setAttendanceRate] = useState(0);
 
+  // 수료증 민팅 페이지로 이동
+  const navigate = useNavigate();
 
   const getNfts = async () => {
-    isLoading({ isLoading: true });
+    // 드롭다운 리스트에서 선택된 주소가 없으면 패스
+    if (selectedAddress ) {
+      isLoading({ isLoading: true });
 
-    const nfts = await getNftsByAddress(selectedAddress);
-    setNfts(nfts);
-    setIsCardExpanded(new Array(nfts.length).fill(false));
-    isLoading({ isLoading: false });
+      const nfts = await getNftsByAddress(selectedAddress);
+      setNfts(nfts);
+      setIsCardExpanded(new Array(nfts.length).fill(false));
+      isLoading({ isLoading: false });
+    }
+
   };
 
   const toggleCardExpansion = (index) => {
@@ -91,13 +98,16 @@ export default function NFTs() {
   const processNFTsForCalendar = (nfts) => {
     const nftByDate = {};
     let count = 0;
-    console.log(`nfts: ${nfts.length}`);
+    //console.log(`nfts: ${nfts.length}`);
     
     nfts
     .filter((nft) => nft.description.includes("출석"))
     .forEach((nft) => {
-      const createdAt = new Date(nft.createdAt).toISOString().split('T')[0]
-      //console.log(`nft's createdAt: ${createdAt}`);
+
+      const _date = new Date(nft.createdAt);
+      const createdAt = `${_date.getFullYear()}-${(_date.getMonth() + 1).toString().padStart(2, '0')}-${_date.getDate().toString().padStart(2, '0')}`;
+      //console.log(`nft's origin date: ${nft.createdAt}`);
+      //console.log(`nft's modify date: ${createdAt}`);
 
       // createdAt에 해당하는 날짜가 없다면 배열 생성
       if (!nftByDate[createdAt]) {
@@ -109,12 +119,13 @@ export default function NFTs() {
       nftByDate[createdAt].push(nft);
     });
 
-    setParticipationDays(count);
-
     // 키 개수 확인
     console.log(`nftByDate: ${Object.keys(nftByDate).length}`);
     console.log(`참여일수: ${count}`);
     console.log(`출석률: ${(count / totalDays) * 100}%`);
+
+    setAttendanceRate(Math.floor((count / totalDays) * 100));
+
     return nftByDate;
   };
 
@@ -150,8 +161,8 @@ export default function NFTs() {
   };
 
   // 캘린더에서 날짜를 클릭했을 때
-  const onDayClick = (value) => {
-    const dateKey = value.toISOString().split('T')[0];
+  const onDayClick = (date) => {
+    const dateKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
     const nft = nfts.find((nft) => new Date(nft.createdAt).toDateString() === dateKey);
     if(nft) {
       openModal(nft);
@@ -160,11 +171,11 @@ export default function NFTs() {
 
   // 캘린더 타일을 렌더링하는 함수
   const renderCalendarTile = ({ date }) => {
-    const dateKey = date.toISOString().split('T')[0];
+    const dateKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
     const dayNfts = calendarNfts[dateKey] || [];
 
-    // 해당 날짜와 dayNfts.length를 콘솔에 출력
-    // console.log(`Date: ${dateKey}, NFT Count: ${dayNfts.length}`);
+    // 입력 날짜 검색 날짜 비교
+    //console.log(`Date: ${date}, NFT Date: ${dateKey}`);
 
     if (dayNfts.length > 0 ){
       // 해당 날짜에 NFT가 있다면 첫번째 NFT만 사용
@@ -191,25 +202,40 @@ export default function NFTs() {
 
   return (
     <Box className="calendar-container">
-      <FormControl sx={{ backgroundColor: '#e8f5f9', width: '100%' }}>
-        <Box>
-          <strong> 수강생 지갑 주소 선택 : {" "} </strong>
-          <Select
-            value={selectedAddress}
-            onChange={handleAddressChange}
-            sx={{ backgroundColor: 'white' }}
-          >
-            {addresses.map((addr) => (
-              <MenuItem key={addr} value={addr}>
-                {addr}
-              </MenuItem>
-            ))}
-          </Select>
-        </Box>
-      </FormControl>
-      <p></p>
 
-      <div className="calendar-message" style={{ textAlign: "right", fontSize: "90%" }}>
+      <Box sx={{ backgroundColor: '#e8f5f9', display: 'flex', alignItems: 'center', width: '100%', padding: '8px' }}>
+        <Typography variant="body1" sx={{ marginLeft: '8x', marginRight: '8x' }}>
+          수강생 지갑주소 선택 :
+        </Typography>
+        <Select
+          value={selectedAddress}
+          onChange={handleAddressChange}
+          sx={{ backgroundColor: 'white', width: '450px',
+          '.MuiSelect-select': {
+            height: '40px',
+            paddingTop: '6px',
+            paddingBottom: '6px',
+          },
+         }}
+        >
+          {addresses.map((addr) => (
+            <MenuItem key={addr} value={addr}>
+              {addr}
+            </MenuItem>
+          ))}
+        </Select>
+        <Typography variant="body1" sx={{ marginLeft: '16px' }}>
+          출석률: {attendanceRate}%
+        </Typography>
+        <Button variant="contained" color="primary" sx={{ marginLeft: '16px' }}
+                disabled={attendanceRate < 70}
+                onClick={() => { navigate("/mint");}}
+        >
+          NFT 수료증 발급
+        </Button>
+      </Box>
+      <p></p>
+      <div className="calendar-message" style={{ textAlign: "right", fontSize: "90%", color: "#3f4ce0" }}>
         출석도장을 클릭하면 상세 내용을 확인하실 수 있습니다.
       </div>
       <p></p>
@@ -222,13 +248,12 @@ export default function NFTs() {
         onClickDay={onDayClick}
         tileContent={renderCalendarTile}
         view="month"
-        calendarType="US"
+        calendarType="gregory"
         next2Label={null} 
         prev2Label={null}
         nextLabel="▶"
         prevLabel="◀"
         formatMonthYear={(locale, date) =>`${date.toLocaleDateString(locale, { month: 'short' })} ${date.getFullYear()}` }
-        locale={ko}
       />
       
       <Modal

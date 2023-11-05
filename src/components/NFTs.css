@@ -11,12 +11,10 @@
     height: 100% !important;
   }
 
-  /* 캘린더 타일의 가로 세로 크기를 100px로 고정 */
 .calendar-tile {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100px; 
   height: 100px;
 }
 
