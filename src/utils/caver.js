@@ -70,7 +70,7 @@ export const MnemocinToAccount = async (mnemonic) => {
 export const minting = async (tokenURI, to) => {
   const mint = AttendContract.methods.mintNFT(to, tokenURI).encodeABI();
 
-  //console.log("tokenURI 정보 : ", tokenURI);
+  console.log("tokenURI 정보 : ", tokenURI);
   //console.log("대상 지갑주소 정보 : ", to);
 
   const estimate = await AttendContract.methods
@@ -79,9 +79,11 @@ export const minting = async (tokenURI, to) => {
       from: REACT_APP_ADDRESS,
     });
 
-  //console.log("예상 실행 가스비 견적 : ", estimate);
+  console.log("예상 실행 가스비 견적 : ", estimate);
+
   const result = await SendTransactionNoValue(mint, AttendCA, estimate);
-  //console.log("트랜잭션 해시 : ", result.hash);
+  console.log("트랜잭션 해시 : ", result.hash);
+
   return result;
 };
 
@@ -107,6 +109,7 @@ export const SendTransactionNoValue = async (data, to, estimateGas) => {
       REACT_APP_PRIVATE_KEY
     )
     .then((res) => res.rawTransaction);
+  console.log("signTx 종료");
 
   const txHash = caver.utils.soliditySha3(signTx);
 

@@ -61,6 +61,10 @@ export default function NFTs() {
   const [totalDays] = useState(19);
   const [attendanceRate, setAttendanceRate] = useState(0);
 
+  // 수료증 발급 여부 체크
+  const [isCertificateIssued, setIsCertificateIssued] = useState(false);
+
+
   // 수료증 민팅 페이지로 이동
   const navigate = useNavigate();
 
@@ -98,7 +102,7 @@ export default function NFTs() {
   const processNFTsForCalendar = (nfts) => {
     const nftByDate = {};
     let count = 0;
-    //console.log(`nfts: ${nfts.length}`);
+    console.log(`nfts: ${nfts.length}`);
     
     nfts
     .filter((nft) => nft.description.includes("출석"))
@@ -155,6 +159,13 @@ export default function NFTs() {
     setCalendarNfts(processedNfts);
   }, [nfts]);
 
+  useEffect(() => {
+    const hasCertificateNFT = nfts.some((nft) =>
+      nft.description.includes("mint_test_019")
+    );
+    setIsCertificateIssued(hasCertificateNFT);
+  }, [nfts]);
+
   // 캘린더에서 날짜가 변경될 때
   const onActiveStartDateChange = ({ activeStartDate }) => {
     setActiveStartDate(activeStartDate);
@@ -202,7 +213,6 @@ export default function NFTs() {
 
   return (
     <Box className="calendar-container">
-
       <Box sx={{ backgroundColor: '#e8f5f9', display: 'flex', alignItems: 'center', width: '100%', padding: '8px' }}>
         <Typography variant="body1" sx={{ marginLeft: '8x', marginRight: '8x' }}>
           수강생 지갑주소 선택 :
@@ -366,6 +376,22 @@ export default function NFTs() {
           )}
         </div>
       </Modal>
+      {isCertificateIssued && (
+        <>
+          <Typography variant="body1" sx={{ marginLeft: '16px' }}>
+            수료증:
+          </Typography>
+          <img src="/ict_certificate.png" alt="수료증" 
+          style={{
+            display: 'block',
+            margin: '0 auto',
+            width: '612px',
+            marginLeft: '4px',
+            justifyContent: 'center',
+            }} 
+          />
+        </>
+      )}
     </Box>
 
   );

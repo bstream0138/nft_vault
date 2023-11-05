@@ -48,12 +48,17 @@ export const getNftsByAddress = async (address) => {
         nftInfo.name = metaData.name;
         nftInfo.description = metaData.description;
 
-        if (metaData.image.slice(0, 4) === "ipfs") {
-          const ipfsHash = metaData.image.slice(7);
-          const checkUri = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
-          nftInfo.image = checkUri;
-        } else {
-          nftInfo.image = metaData.image;
+        if (metaData.image) {
+          if (metaData.image.slice(0, 4) === "ipfs") {
+          
+            const ipfsHash = metaData.image.slice(7);
+            const checkUri = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+            nftInfo.image = checkUri;
+          } else {
+            nftInfo.image = metaData.image;
+          }
+        } else {  // Corrupt Image 예외처리
+          nftInfo.image = "/nft_error.png";
         }
 
         if (metaData.attributes) {
