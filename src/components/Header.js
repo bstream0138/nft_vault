@@ -126,6 +126,7 @@ export default function Header() {
             ICT x Codestates 블록체인 과정 출석부
           </Typography>
         </Box>
+        {/* 연결 지갑 주소, 잔고, 네트워크 상태 표시 */}
         <Box
           sx={{
             display: "flex",

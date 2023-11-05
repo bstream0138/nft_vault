@@ -1,20 +1,16 @@
-// react 캘린더 라이브러리 import
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css'
-import "./NFTs.css";
-
 import React, { useEffect, useState } from "react";
 
 // MUI css
 import {
   Box,
-  CardContent,
-  Card,
   Typography,
-  Switch,
-  FormControlLabel,
   Button,
   TextField,
+  Modal,
+  Select,
+  FormControl,
+  InputLabel,
+  MenuItem,
 } from "@mui/material";
 
 // Recoil
@@ -25,17 +21,29 @@ import { loadingState } from "../recoil/loading.js";
 // Api
 import { getNftsByAddress } from "../APIs/kasCall.js";
 
-// Modal
-import Modal from "@mui/material/Modal";
+// react 캘린더 라이브러리 import
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css'
+import "./NFTs.css";
 
 export default function NFTs() {
+
+  const addresses = [
+    "0x0de9e664f2f8f773b98e42a26a59fffba9a3e2be",
+    "0x5D674b20c73CCf59e7aFDc3fDC5427f59C821cea",
+    "0x111B2F59D47f53572E41c3c78140625DA425E23c",
+    "0xFcCe29a8503b1e66FAfDeB76157EcEbfFCf0309b",
+    "0x812973084D6fBd58D7f440eeFA98C49677894A94",
+    "0xd167Dd9b2B1587532b23BE52a89cfa08614C92Fd",
+    "0x180A008a563eFD8aD0d1025090F7B2Fc2CCCf1b3"
+  ];
+  
   const { address } = useRecoilValue(addressState);
+  const isLoading = useSetRecoilState(loadingState);
   const [nfts, setNfts] = useState([]);
   const [isCardExpanded, setIsCardExpanded] = useState([]);
-  const isLoading = useSetRecoilState(loadingState);
-
-  // 캘린더뷰의 시작일자는 수업 시작일자인 10월 18일로
-  // 10월 18일 시작하려면 9월 18일로 셋팅
+  
+  // 캘린더뷰의 시작일자는 수업 시작일자인 10월 18일로, 10월 18일 시작하려면 9월 18일로 셋팅
   const [activeStartDate, setActiveStartDate] = useState(new Date(2023, 9, 10));
 
   // NFT를 날짜별로 정리
@@ -45,15 +53,18 @@ export default function NFTs() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNFT, setSelectedNFT] = useState(null);
 
-  // 현재 페이지에서 사용할 address 변수 선언
-  const [local_address, setLocalAddress] = useState(address);
-  // 주소입력박스
-  const [inputAddress, setInputAddress] = useState(address);
+  // 출석부에서 표시하고 있는 address 변수
+  const [selectedAddress, setSelectedAddress] = useState(address);
+
+  // 출석률 계산
+  const [totalDays] = useState(19);
+  const [participationDays, setParticipationDays] = useState(0);
+
 
   const getNfts = async () => {
     isLoading({ isLoading: true });
 
-    const nfts = await getNftsByAddress(local_address);
+    const nfts = await getNftsByAddress(selectedAddress);
     setNfts(nfts);
     setIsCardExpanded(new Array(nfts.length).fill(false));
     isLoading({ isLoading: false });
@@ -70,56 +81,42 @@ export default function NFTs() {
       `https://baobab.klaytnscope.com/account/${address}?tabId=txList`
     );
   };
-
   
-  // local address로 NFT 갱신
-  const handleUpdateAddress = async () => {
-    setLocalAddress(inputAddress);
-    const updateNfts = await getNftsByAddress(inputAddress);
-    setNfts(updateNfts);
-    setIsCardExpanded(new Array(updateNfts.length).fill(false));
-  }
-
   const handleTx = (tx) => {
     window.open(`https://baobab.klaytnscope.com/tx/${tx}?tabId=nftTransfer`);
   };
 
-  // 주소 업데이트 관련 
-  const handleInputChange = (event) => {
-    setInputAddress(event.target.value);
-  };
-
-  // 주소 업데이트 관련
-  const updateAddress = () => {
-    setLocalAddress(inputAddress);
-  };
-
-
+  
   // NFT 데이터를 날짜별로 가공하는 함수를 추가합니다.
   const processNFTsForCalendar = (nfts) => {
     const nftByDate = {};
-
-
+    let count = 0;
     console.log(`nfts: ${nfts.length}`);
     
-    nfts.forEach((nft) => {
+    nfts
+    .filter((nft) => nft.description.includes("출석"))
+    .forEach((nft) => {
       const createdAt = new Date(nft.createdAt).toISOString().split('T')[0]
       //console.log(`nft's createdAt: ${createdAt}`);
 
       // createdAt에 해당하는 날짜가 없다면 배열 생성
       if (!nftByDate[createdAt]) {
         nftByDate[createdAt] = [];
+        // 참여일수 증가
+        count++;
       }
 
       nftByDate[createdAt].push(nft);
     });
 
+    setParticipationDays(count);
+
     // 키 개수 확인
     console.log(`nftByDate: ${Object.keys(nftByDate).length}`);
-
+    console.log(`참여일수: ${count}`);
+    console.log(`출석률: ${(count / totalDays) * 100}%`);
     return nftByDate;
   };
-
 
   // 모달 Open & Close
   const openModal = (nft) => {
@@ -132,10 +129,14 @@ export default function NFTs() {
     setIsModalOpen(false);
   };
 
+  // 지갑 주소 변경 시 상태 업데이트
+  const handleAddressChange = (event) => {
+    setSelectedAddress(event.target.value); 
+  };
+
   useEffect(() => {
-    getNfts();    
-    // eslint-disable-next-line
-  }, []);
+    getNfts();    // eslint-disable-next-line
+  }, [selectedAddress]);
 
   // 날짜별로 정리하고, 동일 날짜 NFT는 생성시간 가장 빠른 것만
   useEffect(() => {
@@ -143,26 +144,13 @@ export default function NFTs() {
     setCalendarNfts(processedNfts);
   }, [nfts]);
 
-  // local_address가 변경될 때마다 NFT 목록을 다시 가져오도록 함
-  useEffect(() => {
-    const getNftsByLocalAddress = async () => {
-      isLoading({ isLoading: true });
-      const nfts = await getNftsByAddress(local_address);
-      setNfts(nfts);
-      setIsCardExpanded(new Array(nfts.length).fill(false));
-      isLoading({ isLoading: false });
-    };
-
-    getNftsByLocalAddress();
-  }, [local_address]);
-
   // 캘린더에서 날짜가 변경될 때
-  const onActiveStartDateChange = ({ activeStartDate, value, view }) => {
+  const onActiveStartDateChange = ({ activeStartDate }) => {
     setActiveStartDate(activeStartDate);
   };
 
   // 캘린더에서 날짜를 클릭했을 때
-  const onDayClick = (value, event) => {
+  const onDayClick = (value) => {
     const dateKey = value.toISOString().split('T')[0];
     const nft = nfts.find((nft) => new Date(nft.createdAt).toDateString() === dateKey);
     if(nft) {
@@ -171,15 +159,12 @@ export default function NFTs() {
   };
 
   // 캘린더 타일을 렌더링하는 함수
-  const renderCalendarTile = ({ date, view }) => {
+  const renderCalendarTile = ({ date }) => {
     const dateKey = date.toISOString().split('T')[0];
     const dayNfts = calendarNfts[dateKey] || [];
 
     // 해당 날짜와 dayNfts.length를 콘솔에 출력
     // console.log(`Date: ${dateKey}, NFT Count: ${dayNfts.length}`);
-    // 해당 날짜와 dayNfts.length를 콘솔에 출력
-    // console.log(`Date: ${dateKey}, NFT Count: ${dayNfts.length}`);
-
 
     if (dayNfts.length > 0 ){
       // 해당 날짜에 NFT가 있다면 첫번째 NFT만 사용
@@ -206,26 +191,29 @@ export default function NFTs() {
 
   return (
     <Box className="calendar-container">
-      <TextField
-        label="주소 입력" 
-        variant="outlined"
-        value={inputAddress}
-        onChange={handleInputChange}
-        style={{marginBottom:"20px"}}
-      />
-
-      <Button 
-        variant="contained"
-        color="primary"
-        onClick={handleUpdateAddress}
-        style={{marginBottim: "20px"}}
-      > 
-        해당 주소의 NFT 불러오기 
-      </Button>
+      <FormControl sx={{ backgroundColor: '#e8f5f9', width: '100%' }}>
+        <Box>
+          <strong> 수강생 지갑 주소 선택 : {" "} </strong>
+          <Select
+            value={selectedAddress}
+            onChange={handleAddressChange}
+            sx={{ backgroundColor: 'white' }}
+          >
+            {addresses.map((addr) => (
+              <MenuItem key={addr} value={addr}>
+                {addr}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+      </FormControl>
       <p></p>
-      <div className="calendar-message">
-        해당 일자의 출석도장을 클릭하면 상세 내용을 확인하실 수 있습니다.
+
+      <div className="calendar-message" style={{ textAlign: "right", fontSize: "90%" }}>
+        출석도장을 클릭하면 상세 내용을 확인하실 수 있습니다.
       </div>
+      <p></p>
+
       <Calendar
         className="calendar-container"
         onChange={onDayClick}
@@ -240,7 +228,9 @@ export default function NFTs() {
         nextLabel="▶"
         prevLabel="◀"
         formatMonthYear={(locale, date) =>`${date.toLocaleDateString(locale, { month: 'short' })} ${date.getFullYear()}` }
+        locale={ko}
       />
+      
       <Modal
         open={isModalOpen}
         onClose={closeModal}
@@ -259,7 +249,7 @@ export default function NFTs() {
                 backgroundColor: "white",
                 padding: "16px"
                 }}>
-          <h2 id="modal-title">NFT 상세 정보</h2>
+          <h2 id="modal-title" style={{ textAlign: "center" }}>NFT 상세 정보</h2>
           {selectedNFT && (
             <div id="modal-description">
               <Typography variant="h5">{selectedNFT.name}</Typography>
@@ -288,7 +278,7 @@ export default function NFTs() {
                   style={{ width: "200px" }}
                 />
               </Box>
-              <Typography variant="h8" sx={{ mt: "3px" }}>
+              <Typography variant="h8" sx={{ mt: "3px" }} >
                 {selectedNFT.description}
               </Typography>
               <p></p>

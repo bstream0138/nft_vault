@@ -13,6 +13,9 @@
 
   /* 캘린더 타일의 가로 세로 크기를 100px로 고정 */
 .calendar-tile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100px; 
   height: 100px;
 }
@@ -23,5 +26,7 @@
 
 /* 이미지 좌우 정렬 - 작동 안함 체크할 것 */
 .image-tile {
+  width: 80px;
+  cursor: pointer;
   justify-content: center; 
 }

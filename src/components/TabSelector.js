@@ -30,8 +30,7 @@ export default function TabSelector() {
         indicatorColor="secondary"
         aria-label="secondary tabs example"
       >
-        <Tab label="NFT" value="NFT" />
-        <Tab label="Mint" value="Mint" />
+        <Tab label="NFT 출석부" value="NFT" />
       </Tabs>
     </Box>
   );
