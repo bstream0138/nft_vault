@@ -35,6 +35,7 @@ export default function Mint() {
   
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const setNftMeta = useSetRecoilState(nftMetaState);
 
   const toAddress = useRecoilValue(addressState);
@@ -89,7 +90,7 @@ export default function Mint() {
           message: "전송이 완료되었습니다. Klip에서 확인해주세요.",
         });
         setSuccess({ isSuccess: true });
-        navigate("/NFT");
+        setIsPopupOpen(true);
         successReset();
         isLoading({ isLoading: false });
       } else {
@@ -100,6 +101,16 @@ export default function Mint() {
       isLoading({ isLoading: false });
       reset();
     }
+  };
+
+  /*
+  const closePopup = () => {
+    setIsPopupOpen(false);
+  };
+  */
+
+  const navigateToNFTs = () => {
+    navigate("/NFT");
   };
 
   return (
@@ -159,6 +170,14 @@ export default function Mint() {
           </Box>
         </Box>
       </Box>
+      {isPopupOpen && (
+        <div className="popup">
+          <div className="popup-content">
+            <h2>NFT 수료증이 성공적으로 발급되었습니다.</h2>
+            <button onClick={navigateToNFTs}>확인</button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

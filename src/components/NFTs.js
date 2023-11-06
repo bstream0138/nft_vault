@@ -7,11 +7,8 @@ import {
   Box,
   Typography,
   Button,
-  TextField,
   Modal,
   Select,
-  FormControl,
-  InputLabel,
   MenuItem,
 } from "@mui/material";
 
@@ -31,10 +28,10 @@ import "./NFTs.css";
 export default function NFTs() {
 
   const addresses = [
-    "0x0de9e664f2f8f773b98e42a26a59fffba9a3e2be", //84
-    "0xFcCe29a8503b1e66FAfDeB76157EcEbfFCf0309b", //68
+    "0x0de9e664f2f8f773b98e42a26a59fffba9a3e2be", 
+    "0xFcCe29a8503b1e66FAfDeB76157EcEbfFCf0309b", 
     "0x5D674b20c73CCf59e7aFDc3fDC5427f59C821cea", //100
-    "0x812973084D6fBd58D7f440eeFA98C49677894A94", //57
+    "0x812973084D6fBd58D7f440eeFA98C49677894A94", 
     "0x2CA286026fbBC8bA9b39290bBFEa64d780f47010",
     "0x180A008a563eFD8aD0d1025090F7B2Fc2CCCf1b3"
   ];
@@ -42,7 +39,7 @@ export default function NFTs() {
   const { address } = useRecoilValue(addressState);
   const isLoading = useSetRecoilState(loadingState);
   const [nfts, setNfts] = useState([]);
-  const [isCardExpanded, setIsCardExpanded] = useState([]);
+  //const [isCardExpanded, setIsCardExpanded] = useState([]);
   
   // 캘린더뷰의 시작일자는 수업 시작일자인 10월 18일로, 10월 18일 시작하려면 9월 18일로 셋팅
   const [activeStartDate, setActiveStartDate] = useState(new Date(2023, 9, 10));
@@ -58,11 +55,14 @@ export default function NFTs() {
   const [selectedAddress, setSelectedAddress] = useState("");
 
   // 출석률 계산
-  const [totalDays] = useState(19);
+  const [totalDays] = useState(20);
   const [attendanceRate, setAttendanceRate] = useState(0);
 
   // 수료증 발급 여부 체크
-  const [isCertificateIssued, setIsCertificateIssued] = useState(false);
+  //const [isCertificateIssued, setIsCertificateIssued] = useState(false);
+
+  // 수료증 NFT
+  //const [selectedNFTData, setSelectedNFTData] = useState(null);
 
 
   // 수료증 민팅 페이지로 이동
@@ -75,17 +75,19 @@ export default function NFTs() {
 
       const nfts = await getNftsByAddress(selectedAddress);
       setNfts(nfts);
-      setIsCardExpanded(new Array(nfts.length).fill(false));
+      //setIsCardExpanded(new Array(nfts.length).fill(false));
       isLoading({ isLoading: false });
     }
 
   };
 
+  /*
   const toggleCardExpansion = (index) => {
     setIsCardExpanded((prevState) =>
       prevState.map((value, i) => (i === index ? !value : value))
     );
   };
+  */
 
   const handleAddress = (address) => {
     window.open(
@@ -159,12 +161,21 @@ export default function NFTs() {
     setCalendarNfts(processedNfts);
   }, [nfts]);
 
+  /*
   useEffect(() => {
     const hasCertificateNFT = nfts.some((nft) =>
-      nft.description.includes("mint_test_019")
+      nft.description.includes("mint_test_020")
     );
     setIsCertificateIssued(hasCertificateNFT);
   }, [nfts]);
+
+  useEffect(() => {
+    const matchingNFT = nfts.find((nft) =>
+      nft.description.includes("mint_test_020")
+    );
+    setSelectedNFTData(matchingNFT);
+  }, [nfts]);  
+  */
 
   // 캘린더에서 날짜가 변경될 때
   const onActiveStartDateChange = ({ activeStartDate }) => {
@@ -376,8 +387,9 @@ export default function NFTs() {
           )}
         </div>
       </Modal>
-      {isCertificateIssued && (
-        <>
+      {/*
+      {isCertificateIssued ? (
+        <div>
           <Typography variant="body1" sx={{ marginLeft: '16px' }}>
             수료증:
           </Typography>
@@ -390,8 +402,54 @@ export default function NFTs() {
             justifyContent: 'center',
             }} 
           />
-        </>
-      )}
+          <Typography variant="h5">{selectedNFTData.name}</Typography>
+          <Typography variant="h8" sx={{ mt: "3px" }} >{selectedNFTData.description}</Typography>
+          <Box sx={{ display: "flex" }}>
+            <Typography fontSize="small">
+              Contract Address :
+            </Typography>
+            <Typography
+              variant="h10"
+              color="blue"
+              fontSize="small"
+              sx={{ cursor: "pointer", ml: "4px" }}
+              onClick={() => handleAddress(selectedNFTData.contractAddress)}
+            >
+              {selectedNFTData.contractAddress.slice(0, 6)}...
+              {selectedNFTData.contractAddress.slice(
+                selectedNFTData.contractAddress.length - 5,
+                selectedNFTData.contractAddress.length - 1
+              )}
+            </Typography>
+          </Box>
+          <Box sx={{ mt: "10px", display: "flex" }}>
+            <Typography fontSize="small">
+              Last Updated :{" "}
+            </Typography>
+            <Typography fontSize="small" sx={{ ml: "4px" }}>
+              {selectedNFTData.createdAt}
+            </Typography>
+          </Box>
+          <Box sx={{ mt: "10px", display: "flex" }}>
+            <Typography fontSize="small">Transaction : </Typography>
+            <Typography
+              variant="h10"
+              color="blue"
+              fontSize="small"
+              sx={{ cursor: "pointer", ml: "4px" }}
+              onClick={() => handleTx(selectedNFTData.transactionHash)}
+            >
+              {selectedNFTData.transactionHash.slice(0, 6)}...
+              {selectedNFTData.transactionHash.slice(
+                selectedNFTData.transactionHash.length - 5,
+                selectedNFTData.transactionHash.length - 1
+              )}
+            </Typography>
+          </Box>
+
+        </div>
+      ) : null }
+              */}
     </Box>
 
   );

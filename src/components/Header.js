@@ -123,7 +123,7 @@ export default function Header() {
         >
           <img src={headerMMG} width="auto" height="40px" alt="logo" />
           <Typography variant="h4" ml="10px">
-            ICT x Codestates 블록체인 과정 출석부
+            서울 ICT 블록체인 심화 - NFT 과정 출석부
           </Typography>
         </Box>
         {/* 연결 지갑 주소, 잔고, 네트워크 상태 표시 */}
